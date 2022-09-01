@@ -1,70 +1,53 @@
-# Maximiliano Martinez Marquez
-# A01251527
+import pandas as pd # utilizado para importar dataset
+from sklearn import preprocessing # utilizado para normalizar dataset
+from sklearn.metrics import accuracy_score
+
+# funcion para realizar las predicciones
+def predict(row, coefficients):
+    yhat = coefficients[0]
+    for i in range(len(row)-1):
+        yhat += coefficients[i + 1] * row[i]
+    return yhat
+
+# Estimando coeficientes utilizando gradiente descendiente
+def gradiente_d(train, l_rate, n_epoch):
+    # coef a generar dependiendo de las variables
+    coef = [0.0 for i in range(len(train[0]))]
+    for epoch in range(n_epoch):
+        sum_error = 0
+        for row in train:
+            yhat = predict(row, coef) # Realizar predicción
+            error = yhat - row[-1] # Obtener el error 
+            sum_error += error**2 # Suma de error al cuadrado
+            # Obtener nuevo coeficiente para la siguiente iteración
+            coef[0] = coef[0] - l_rate * error
+            # para cada var en la fila
+            for i in range(len(row)-1):
+                # a partir del segundo coeficiente obtener uno nuevo
+                coef[i + 1] = coef[i + 1] - l_rate * error * row[i]
+        #print('>epoch=%d, lrate=%.3f, error=%.3f' % (epoch, l_rate, sum_error))
+    return coef
 
 
-import pandas as pd 
+red_wine = pd.read_csv('winequality_red.csv', header = 0)
+y = red_wine['class']
+red_wine = red_wine.drop('class', axis=1)
+print(red_wine.head())
 
-columns = ["Car_Name","Year","Selling_Price",
-            "Present_Price","Kms_Driven",
-            "Fuel_Type","Seller_Type",
-            "Transmission","Owner"] 
+x = red_wine.values
 
-cars = pd.read_csv('car_data.csv', header = 0)
-#cars.drop(cars.loc[cars['Present_Price']>80].index, inplace=True)
-#cars.reset_index(drop=True, inplace = True)
-cars.head()
+# escalar a entre 1 y 0
+min_max_scaler = preprocessing.MinMaxScaler()
+x_scaled = min_max_scaler.fit_transform(x)
+df = list(x_scaled)
 
-x = cars['Present_Price']
-y = cars['Selling_Price']
+l_rate = 0.01
+n_epoch = 100
+coef = gradiente_d(df, l_rate, n_epoch)
 
-x.info() 
-#y.info()
-
-import matplotlib.pyplot as plt
-
-plt.xlabel('Present Price')
-plt.ylabel('Selling Price')
-plt.plot(x, y, 'bo')
-plt.show()
-# 92 value outlier
-
-mean_x = sum(x) / float(len(x))
-var_x = sum([(i-mean_x)**2 for i in x])
-print("x stats: mean=%.3f variance=%.3f" % (mean_x, var_x))
-
-mean_y = sum(y) / float(len(y))
-var_y = sum([(i-mean_y)**2 for i in y])
-print("y stats: mean=%.3f variance=%.3f" % (mean_y, var_y))
-
-covar = 0.0
-for i in range(len(x)):
-	covar += (x[i] - mean_x) * (y[i] - mean_y)
-print('Covariance: %.3f' % (covar))
-
-# y = mx + b
-# E = (1/n)* sum(y_i-y) 
-b1 = covar / var_x
-b0 = mean_y - b1 * mean_x
-
-print('Coefficients: B0=%.3f, B1=%.3f' % (b0, b1))
-
-h = lambda x, theta: theta[0] + theta[1]*x
-theta = [b1,b0]
-y_new = []
-for x_i in x:
-    y_new.append(h(x_i,theta))
-
-error_total = 0
-for i in range(len(x)):
-    error_total += (y[i] - (h(x[i], theta)))**2
-error_total / float(len(x))
-print("Error Total:", error_total)
-
-plt.xlabel('Present Price')
-plt.ylabel('Selling Price')
-plt.plot(x, y, 'ob')
-plt.plot(x, y_new, '-r')
-plt.show()
-
-# Para visualizar las dos graficas debe de cerrar
-# la primera.
+# Realizar prediccion y guardar en array de y_pred_line
+y_pred_line = []
+for row in df[:5]:
+    yhat = predict(row, coef)
+    y_pred_line.append(yhat)
+    #print("Expected=%.3f, Predicted=%.3f [%d]" % (row[-1], yhat, round(yhat)))
