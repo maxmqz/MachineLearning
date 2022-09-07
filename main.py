@@ -43,21 +43,28 @@ def main():
     red_wine = pd.read_csv('winequality_red.csv', header = 0)
     y = red_wine['class']
     X = red_wine.drop('class', axis=1)
-
+    '''
+    for col_name in X: 
+        print(col_name)
+    '''
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1)
 
     lr = logisticRegression(alpha=0.0001,n_epoch=1000)
     lr.fit(X_train, y_train)
 
     predictions = lr.predict(X_test)
-
+    
+    '''
+    pd.set_option('display.max_columns', None)
+    print(X_test.head(5))
     c = 0
     for i, j in zip(y_test, predictions):
         print(f"Expected: {i} --> Predicted: {j}")
         c += 1
         if c == 5:
             break
-
+    '''
+    
     print("Accuracy: ",accuracy(y_test, predictions))
 
 def accuracy(y_true,y_pred):
