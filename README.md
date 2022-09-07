@@ -22,6 +22,7 @@
         * pH
         * sulphates
         * alcohol
+        
     valor a predecir: class (0, 1)
     ---
     0. Expected: 0 --> Predicted: 1
