@@ -7,10 +7,10 @@
 
 * Predicciones de Prueba (primeras 5):
 
-    valores de entrada (hiper-parámetros): 
+    * valores de entrada (hiper-parámetros): 
         * alpha=0.0001
         * n_epoch=1000
-    valores de entrada del modelo (features):
+    * valores de entrada del modelo (features):
         * fixed acidity
         * volatile acidity
         * citric acid     
