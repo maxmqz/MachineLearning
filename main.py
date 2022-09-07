@@ -1,53 +1,69 @@
-import pandas as pd # utilizado para importar dataset
-from sklearn import preprocessing # utilizado para normalizar dataset
-from sklearn.metrics import accuracy_score
+import numpy as np
+import pandas as pd
+from sklearn.model_selection import train_test_split
 
-# funcion para realizar las predicciones
-def predict(row, coefficients):
-    yhat = coefficients[0]
-    for i in range(len(row)-1):
-        yhat += coefficients[i + 1] * row[i]
-    return yhat
+class logisticRegression:
+    def __init__(self,alpha=0.001,n_epoch=1000):
+        self.alpha = alpha
+        self.n_epoch = n_epoch
+        self.coef = None
+        self.bias = None # intercept
 
-# Estimando coeficientes utilizando gradiente descendiente
-def gradiente_d(train, l_rate, n_epoch):
-    # coef a generar dependiendo de las variables
-    coef = [0.0 for i in range(len(train[0]))]
-    for epoch in range(n_epoch):
-        sum_error = 0
-        for row in train:
-            yhat = predict(row, coef) # Realizar predicción
-            error = yhat - row[-1] # Obtener el error 
-            sum_error += error**2 # Suma de error al cuadrado
-            # Obtener nuevo coeficiente para la siguiente iteración
-            coef[0] = coef[0] - l_rate * error
-            # para cada var en la fila
-            for i in range(len(row)-1):
-                # a partir del segundo coeficiente obtener uno nuevo
-                coef[i + 1] = coef[i + 1] - l_rate * error * row[i]
-        #print('>epoch=%d, lrate=%.3f, error=%.3f' % (epoch, l_rate, sum_error))
-    return coef
+    def fit(self,X,y):
+        n_samples, n_features = X.shape
+        self.coef = np.zeros(n_features)
+        self.bias = 0
 
+        # gradiente descendente
+        for _ in range(self.n_epoch):
+            prediction = np.dot(X,self.coef) + self.bias
+            y_predicted = self._sigmoid(prediction)
+            
+            # en X.T 'T' es de transpose 
+            # Calcular nuevos coeficientes
+            b = (1/n_samples) * np.dot(X.T,(y_predicted-y))
+            x = (1/n_samples) * np.sum(y_predicted-y)
+            
+            # se puede realizar esta operacion ya que son numpy arrays
+            self.coef -= self.alpha * b
+            self.bias -= self.alpha * x 
 
-red_wine = pd.read_csv('winequality_red.csv', header = 0)
-y = red_wine['class']
-red_wine = red_wine.drop('class', axis=1)
-print(red_wine.head())
+    def predict(self,X):
+        prediction = np.dot(X,self.coef) + self.bias
+        y_predicted = self._sigmoid(prediction)
+        # convertir predicciones a binario usando list comprehension
+        y_predicted_b = [1 if i>0.5 else 0 for i in y_predicted]
+        return y_predicted_b
+  
+    def _sigmoid(self,x):
+        return 1 / (1 + np.exp(-x))
+  
 
-x = red_wine.values
+def main():
+    red_wine = pd.read_csv('winequality_red.csv', header = 0)
+    y = red_wine['class']
+    X = red_wine.drop('class', axis=1)
 
-# escalar a entre 1 y 0
-min_max_scaler = preprocessing.MinMaxScaler()
-x_scaled = min_max_scaler.fit_transform(x)
-df = list(x_scaled)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=1)
 
-l_rate = 0.01
-n_epoch = 100
-coef = gradiente_d(df, l_rate, n_epoch)
+    lr = logisticRegression(alpha=0.0001,n_epoch=1000)
+    lr.fit(X_train, y_train)
 
-# Realizar prediccion y guardar en array de y_pred_line
-y_pred_line = []
-for row in df[:5]:
-    yhat = predict(row, coef)
-    y_pred_line.append(yhat)
-    #print("Expected=%.3f, Predicted=%.3f [%d]" % (row[-1], yhat, round(yhat)))
+    predictions = lr.predict(X_test)
+
+    c = 0
+    for i, j in zip(y_test, predictions):
+        print(f"Expected: {i} --> Predicted: {j}")
+        c += 1
+        if c == 5:
+            break
+
+    print("Accuracy: ",accuracy(y_test, predictions))
+
+def accuracy(y_true,y_pred):
+    # if true, add one, else add 0, luego divide entre la longitud
+    accuracy = np.sum(y_true == y_pred)/len(y_true)
+    return accuracy
+
+if __name__ == "__main__":
+    main()
