@@ -34,13 +34,13 @@ class logisticRegression:
         # convertir predicciones a binario usando list comprehension
         y_predicted_b = [1 if i>0.5 else 0 for i in y_predicted]
         return y_predicted_b
-  
+
     def _sigmoid(self,x):
         return 1 / (1 + np.exp(-x))
-  
+
 
 def main():
-    red_wine = pd.read_csv('winequality_red.csv', header = 0)
+    red_wine = pd.read_csv('..\MachineLearning\winequality_red.csv', header = 0)
     y = red_wine['class']
     X = red_wine.drop('class', axis=1)
     '''
@@ -64,13 +64,13 @@ def main():
         if c == 5:
             break
     '''
-    
-    print("Accuracy: ",accuracy(y_test, predictions))
+    print("Accuracy:", accuracy(y_test, predictions))
 
 def accuracy(y_true,y_pred):
     # if true, add one, else add 0, luego divide entre la longitud
     accuracy = np.sum(y_true == y_pred)/len(y_true)
     return accuracy
+
 
 if __name__ == "__main__":
     main()
