@@ -54,16 +54,16 @@ def main():
 
     predictions = lr.predict(X_test)
     
-    '''
-    pd.set_option('display.max_columns', None)
-    print(X_test.head(5))
+    
+    #pd.set_option('display.max_columns', None)
+    #print(X_test.head(5))
     c = 0
     for i, j in zip(y_test, predictions):
         print(f"Expected: {i} --> Predicted: {j}")
         c += 1
         if c == 5:
             break
-    '''
+    
     print("Accuracy:", accuracy(y_test, predictions))
 
 def accuracy(y_true,y_pred):
