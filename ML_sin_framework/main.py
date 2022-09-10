@@ -54,7 +54,7 @@ def main():
 
     predictions = lr.predict(X_test)
     
-    '''
+    
     pd.set_option('display.max_columns', None)
     print(X_test.head(5))
     c = 0
@@ -63,7 +63,7 @@ def main():
         c += 1
         if c == 5:
             break
-    '''
+    
     print("Accuracy:", accuracy(y_test, predictions))
 
 def accuracy(y_true,y_pred):
