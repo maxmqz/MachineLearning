@@ -2,8 +2,9 @@
 
 * Archivo a revisar:    main.py
 * Modelo:               Bosque Aleatorio
+* Libreria utilizada:   sklearn.ensemble (RandomForestClassifier)
 * Dataset:              winequality_red.csv
-* Métrica de desempeño: Accuracy (0.625)
+* Métrica de desempeño: Accuracy (0.834)
 
 * Predicciones de Prueba (primeras 5):
 
