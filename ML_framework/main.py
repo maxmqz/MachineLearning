@@ -23,7 +23,7 @@ def main():
     rfc.fit(X_train, y_train)
     #plot_tree(rfc, X_test) 
     print("Accuracy:", rfc.score(X_test, y_test))
-    '''
+    
     predictions = rfc.predict(X_test)
     pd.set_option('display.max_columns', None)
     print(X_test.head(5))
@@ -33,7 +33,7 @@ def main():
         c += 1
         if c == 5:
             break
-    '''
+    
 
 # code below used for visualizing a single tree(42)
 def plot_tree(rfc, X_test):  
